@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hybrid Legal Search</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .result { margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; }
+    .highlight { background: yellow; }
+    #history { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>⚖️ Hybrid Legal Search</h1>
+  <input id="query" type="text" size="60" placeholder="Enter query..." />
+  <label>α (vector weight): <input id="alpha" type="range" min="0" max="1" step="0.1" value="0.5"/></label>
+  <button onclick="doSearch()">Search</button>
+  <div id="results"></div>
+  <div id="pagination"></div>
+  <div id="history"><h3>Search History</h3><ul id="historyList"></ul></div>
+
+<script>
+let history = [];
+let pageSize = 3;
+let currentPage = 1;
+let currentResults = [];
+
+function highlight(text, query) {
+  let terms = query.toLowerCase().split(/\s+/);
+  terms.forEach(t => {
+    if (t.length > 2) {
+      let regex = new RegExp(t, "gi");
+      text = text.replace(regex, match => '<span class="highlight">'+match+'</span>');
+    }
+  });
+  return text;
+}
+
+function renderResults() {
+  let start = (currentPage-1)*pageSize;
+  let end = start + pageSize;
+  let paginated = currentResults.slice(start, end);
+  let html = paginated.map(r => `<div class='result'><b>[${r.id}]</b> ${highlight(r.text, document.getElementById('query').value)}<br><small>Score: ${r.score.toFixed(3)}</small></div>`).join("");
+  document.getElementById("results").innerHTML = html;
+
+  // pagination
+  let totalPages = Math.ceil(currentResults.length / pageSize);
+  let paginationHTML = "";
+  for(let i=1;i<=totalPages;i++){
+    paginationHTML += `<button onclick="gotoPage(${i})">${i}</button>`;
+  }
+  document.getElementById("pagination").innerHTML = paginationHTML;
+}
+
+function gotoPage(p) {
+  currentPage = p;
+  renderResults();
+}
+
+function doSearch() {
+  let q = document.getElementById("query").value;
+  let alpha = document.getElementById("alpha").value;
+  fetch(`/search?q=${encodeURIComponent(q)}&alpha=${alpha}`)
+    .then(r => r.json())
+    .then(data => {
+      currentResults = data.results;
+      currentPage = 1;
+      renderResults();
+      history.push(q);
+      document.getElementById("historyList").innerHTML = history.map(h => "<li>"+h+"</li>").join("");
+    });
+}
+</script>
+</body>
+</html>
