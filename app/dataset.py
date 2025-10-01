@@ -1,4 +1,3 @@
-# Sample legal dataset (toy example)
 documents = [
     {"id": "1", "text": "Section 420 IPC: Cheating and dishonestly inducing delivery of property."},
     {"id": "2", "text": "Article 14 of the Constitution guarantees equality before the law."},
@@ -6,7 +5,6 @@ documents = [
     {"id": "4", "text": "Habeas corpus is a fundamental right under Article 21."},
 ]
 
-# relevance labels (query -> relevant doc ids)
 queries = {
     "cheating law": ["1"],
     "right to equality": ["2"],

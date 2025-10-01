@@ -42,7 +42,6 @@ function renderResults() {
   let html = paginated.map(r => `<div class='result'><b>[${r.id}]</b> ${highlight(r.text, document.getElementById('query').value)}<br><small>Score: ${r.score.toFixed(3)}</small></div>`).join("");
   document.getElementById("results").innerHTML = html;
 
-  // pagination
   let totalPages = Math.ceil(currentResults.length / pageSize);
   let paginationHTML = "";
   for(let i=1;i<=totalPages;i++){

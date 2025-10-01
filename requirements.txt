@@ -1,6 +1,5 @@
 fastapi
 uvicorn
-qdrant-client
 rank-bm25
 sentence-transformers
 scikit-learn

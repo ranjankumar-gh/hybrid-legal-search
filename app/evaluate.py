@@ -22,13 +22,15 @@ def evaluate(engine=None, k=5):
     if engine is None:
         engine = HybridSearch()
 
-    metrics = {"precision": [], "recall": [], "ndcg": []}
-    for q, relevant in queries.items():
-        res = engine.search(q, alpha=0.5, top_k=k)
-        metrics["precision"].append(precision_at_k(res, relevant, k))
-        metrics["recall"].append(recall_at_k(res, relevant, k))
-        metrics["ndcg"].append(ndcg_at_k(res, relevant, k))
-
-    print("Precision@%d: %.3f" % (k, np.mean(metrics["precision"])))
-    print("Recall@%d: %.3f" % (k, np.mean(metrics["recall"])))
-    print("NDCG@%d: %.3f" % (k, np.mean(metrics["ndcg"])))
+    modes = {"Hybrid-NoRerank": False, "Hybrid": True}
+    for mode, rerank in modes.items():
+        metrics = {"precision": [], "recall": [], "ndcg": []}
+        for q, relevant in queries.items():
+            res = engine.search(q, alpha=0.5, top_k=k, re_rank=rerank)
+            metrics["precision"].append(precision_at_k(res, relevant, k))
+            metrics["recall"].append(recall_at_k(res, relevant, k))
+            metrics["ndcg"].append(ndcg_at_k(res, relevant, k))
+        print(f"\n=== {mode} ===")
+        print("Precision@%d: %.3f" % (k, np.mean(metrics["precision"])))
+        print("Recall@%d: %.3f" % (k, np.mean(metrics["recall"])))
+        print("NDCG@%d: %.3f" % (k, np.mean(metrics["ndcg"])))
